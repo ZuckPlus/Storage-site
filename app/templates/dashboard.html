@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Storage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: #6a11cb;
+            color: white;
+        }
+
+        .navbar .navbar-brand {
+            font-weight: bold;
+            color: white;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: white;
+            position: fixed;
+            top: 1;
+            left: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            padding-top: 1rem;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .sidebar .nav-link:hover {
+            background: #f5f5f5;
+            border-left: 4px solid #6a11cb;
+            color: #6a11cb;
+        }
+
+        .content {
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background: white;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+        }
+
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+        }
+
+        .actions button {
+            background: none;
+            border: none;
+            color: #6a11cb;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .actions button:hover {
+            color: #333;
+        }
+
+        .upload-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-container input[type="text"],
+        .upload-container input[type="file"] {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 0.5rem;
+        }
+
+        .upload-container button {
+            flex-shrink: 0;
+            border: none;
+            background: #6a11cb;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .upload-container button:hover {
+            background-color: #4e0ca3;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">My Storage</a>
+            <form class="d-flex ms-auto" method="GET" action="{{ url_for('main.dashboard') }}">
+                <input class="form-control me-2" type="search" name="search" placeholder="Search files..." aria-label="Search" value="{{ search }}">
+                <select class="form-select me-2" name="filter">
+                    <option value="" {% if not file_filter %}selected{% endif %}>All</option>
+                    <option value="image" {% if file_filter == 'image' %}selected{% endif %}>Images</option>
+                    <option value="pdf" {% if file_filter == 'pdf' %}selected{% endif %}>PDFs</option>
+                    <option value="video" {% if file_filter == 'video' %}selected{% endif %}>Videos</option>
+                    <option value="audio" {% if file_filter == 'audio' %}selected{% endif %}>Audio</option>
+                </select>
+                <button class="btn btn-light" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link active" href="{{ url_for('main.dashboard') }}"><i class="fas fa-home me-2"></i>Home</a>
+            <a class="nav-link" href="#"><i class="fas fa-folder me-2"></i>My Files</a>
+            <a class="nav-link" href="#"><i class="fas fa-share-alt me-2"></i>Shared with Me</a>
+            <a class="nav-link" href="#"><i class="fas fa-trash me-2"></i>Trash</a>
+            <a class="nav-link" href="#"><i class="fas fa-chart-pie me-2"></i>Storage</a>
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <h1>Welcome, {{ current_user.username }}!</h1>
+
+        <!-- Integrated Upload and Folder Creation -->
+        <div class="upload-container">
+            <form action="{{ url_for('main.create_folder') }}" method="POST" class="d-inline">
+                {{ form.hidden_tag() }}
+                <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                <input type="text" name="folder_name" placeholder="New Folder Name" required>
+                <button type="submit">Create Folder</button>
+            </form>
+            <form action="{{ url_for('main.upload_file') }}" method="POST" enctype="multipart/form-data" class="d-inline">
+                {{ form.hidden_tag() }}
+                <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                <input type="file" name="file" required>
+                <button type="submit">Upload File</button>
+            </form>
+        </div>
+
+        <!-- Grid View -->
+        <div class="grid-container">
+            {% for folder in folders %}
+            <div class="card folder-card">
+                <a href="{{ url_for('main.dashboard', parent_folder=folder) }}">
+                    <i class="fas fa-folder card-img-top text-warning" style="font-size: 5rem; padding: 2rem;"></i>
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">{{ folder }}</h5>
+                    <div class="actions">
+                        <a href="{{ url_for('main.dashboard', parent_folder=folder) }}"><i class="fas fa-eye"></i></a>
+                        <button class="btn btn-primary rename-folder" data-folder-name="{{ folder }}" data-parent-folder="{{ parent_folder }}"><i class="fas fa-edit"></i></button>
+                        <form action="{{ url_for('main.delete_folder') }}" method="POST" class="d-inline">
+                            {{ form.hidden_tag() }}
+                            <input type="hidden" name="folder_name" value="{{ folder }}">
+                            <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                            <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% for file in files %}
+            <div class="col">
+                <div class="card">
+                    {% if file.file_type.startswith('image/') %}
+                    <img src="{{ url_for('main.download_file', file_id=file.id) }}" alt="{{ file.filename }}">
+                    {% else %}
+                    <i class="fas fa-file card-img-top text-info" style="font-size: 5rem; padding: 2rem;"></i>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ file.filename }}</h5>
+                        <div class="actions">
+                            <a href="{{ url_for('main.download_file', file_id=file.id) }}" class="btn btn-success"><i class="fas fa-download"></i></a>
+                            <!-- Rename Button to Open Modal -->
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal{{ file.id }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <form action="{{ url_for('main.delete_file', file_id=file.id) }}" method="POST" class="d-inline">
+                                {{ form.hidden_tag() }}
+                                <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                                <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Rename Modal -->
+                <div class="modal fade" id="renameModal{{ file.id }}" tabindex="-1" aria-labelledby="renameModalLabel{{ file.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="{{ url_for('main.rename_file', file_id=file.id) }}" method="POST">
+                                {{ form.hidden_tag() }}
+                                <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="renameModalLabel{{ file.id }}">Rename File</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="newFilename{{ file.id }}" class="form-label">New Filename</label>
+                                        <input type="text" class="form-control" id="newFilename{{ file.id }}" name="new_filename" value="{{ file.filename }}" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Rename</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}            
+        </div>
+    </div>
+
+    <!-- Modal for Actions -->
+    <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="actionModalLabel">Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Rename Section -->
+                    <div id="renameSection" class="d-none">
+                        <label for="renameInput" class="form-label">New Name</label>
+                        <input type="text" id="renameInput" class="form-control">
+                    </div>
+                    <!-- Share Section -->
+                    <div id="shareSection" class="d-none">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="shareToggle">
+                            
+                            <label class="form-check-label" for="shareToggle">Enable Sharing</label>
+                        </div>
+                        <label for="shareUrl" class="form-label mt-3">Shareable Link</label>
+                        <input type="text" id="shareUrl" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmAction">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Updated Actions for Rename and Share
+        document.addEventListener('DOMContentLoaded', () => {
+            const actionModal = new bootstrap.Modal(document.getElementById('actionModal'));
+            const actionLabel = document.getElementById('actionModalLabel');
+            const renameSection = document.getElementById('renameSection');
+            const shareSection = document.getElementById('shareSection');
+            const renameInput = document.getElementById('renameInput');
+            const shareToggle = document.getElementById('shareToggle');
+            const shareUrl = document.getElementById('shareUrl');
+            const confirmAction = document.getElementById('confirmAction');
+        
+            let currentAction = null;
+            let currentFileId = null;
+        
+            // Handle Rename Button
+            document.querySelectorAll('.rename-file').forEach(button => {
+                button.addEventListener('click', () => {
+                    currentFileId = button.dataset.fileId;
+                    currentAction = 'rename';
+                    actionLabel.textContent = 'Rename File';
+                    renameInput.value = button.dataset.fileName;
+        
+                    renameSection.classList.remove('d-none');
+                    shareSection.classList.add('d-none');
+                    actionModal.show();
+                });
+            });
+        
+            // Handle Share Button
+            document.querySelectorAll('.share-file').forEach(button => {
+                button.addEventListener('click', () => {
+                    currentFileId = button.dataset.fileId;
+                    currentAction = 'share';
+                    actionLabel.textContent = 'Share File';
+                    shareToggle.checked = button.dataset.shared === 'True';
+                    shareUrl.value = shareToggle.checked ? window.location.origin + '/download_file/' + currentFileId : '';
+        
+                    renameSection.classList.add('d-none');
+                    shareSection.classList.remove('d-none');
+                    actionModal.show();
+                });
+            });
+        
+            // Confirm Action Button
+            confirmAction.addEventListener('click', async () => {
+                if (currentAction === 'rename') {
+                    const newFilename = renameInput.value;
+                    try {
+                        const response = await fetch(`/rename_file/${currentFileId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ new_filename: newFilename })
+                        });
+        
+                        if (response.ok) {
+                            alert('File renamed successfully.');
+                            location.reload();
+                        } else {
+                            const data = await response.json();
+                            alert('Error: ' + data.error);
+                        }
+                    } catch (err) {
+                        console.error('Rename failed:', err);
+                    }
+                } else if (currentAction === 'share') {
+                    try {
+                        const response = await fetch(`/toggle_sharing/${currentFileId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+        
+                        const data = await response.json();
+                        if (response.ok) {
+                            shareUrl.value = data.shared ? data.url : '';
+                            alert(data.shared ? 'Sharing enabled. Link copied!' : 'Sharing disabled.');
+                            if (data.shared) navigator.clipboard.writeText(data.url);
+                        } else {
+                            alert('Error toggling sharing.');
+                        }
+                    } catch (err) {
+                        console.error('Share toggle failed:', err);
+                    }
+                }
+                actionModal.hide();
+            });
+        });
+    </script>        
+</body>
+</html>

@@ -1,0 +1,1 @@
+ALLOWED_FILE_TYPES = {'jpg', 'jpeg', 'png', 'pdf'}

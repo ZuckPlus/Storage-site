@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Keep the same styles as dashboard */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
+            overflow-x: hidden;
+        }
+        .navbar { background: #6a11cb; color: white; }
+        .navbar .navbar-brand { font-weight: bold; color: white; }
+        .sidebar { width: 250px; height: 100vh; background: white; position: fixed; top: 1; left: 0; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); padding-top: 1rem; }
+        .sidebar .nav-link { color: #333; font-weight: bold; }
+        .sidebar .nav-link:hover { background: #f5f5f5; border-left: 4px solid #6a11cb; color: #6a11cb; }
+        .content { margin-left: 260px; padding: 2rem; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .card { border: none; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; background: white; position: relative; transition: transform 0.3s ease; }
+        .card:hover { transform: scale(1.03); }
+        .card img { width: 100%; height: 150px; object-fit: cover; }
+        .card-body { padding: 1rem; text-align: center; }
+        .card-title { font-size: 1.2rem; font-weight: bold; color: #333; }
+        .actions { display: flex; justify-content: space-around; margin-top: 1rem; }
+        .actions button { background: none; border: none; color: #6a11cb; font-size: 1.2rem; cursor: pointer; }
+        .actions button:hover { color: #333; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">My Storage</a>
+            <form class="d-flex ms-auto" method="GET" action="{{ url_for('main.search_results') }}">
+                <input class="form-control me-2" type="search" name="search" placeholder="Search files..." aria-label="Search" value="{{ search }}">
+                <select class="form-select me-2" name="filter">
+                    <option value="" {% if not file_filter %}selected{% endif %}>All</option>
+                    <option value="image" {% if file_filter == 'image' %}selected{% endif %}>Images</option>
+                    <option value="pdf" {% if file_filter == 'pdf' %}selected{% endif %}>PDFs</option>
+                    <option value="video" {% if file_filter == 'video' %}selected{% endif %}>Videos</option>
+                    <option value="audio" {% if file_filter == 'audio' %}selected{% endif %}>Audio</option>
+                </select>
+                <button class="btn btn-light" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="fas fa-home me-2"></i>Home</a>
+            <a class="nav-link" href="#"><i class="fas fa-folder me-2"></i>My Files</a>
+            <a class="nav-link" href="#"><i class="fas fa-share-alt me-2"></i>Shared with Me</a>
+            <a class="nav-link" href="#"><i class="fas fa-trash me-2"></i>Trash</a>
+            <a class="nav-link" href="#"><i class="fas fa-chart-pie me-2"></i>Storage</a>
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <h1>Search Results for "{{ search }}"</h1>
+        <div class="grid-container">
+            {% for file in files %}
+            <div class="card">
+                {% if file.file_type.startswith('image/') %}
+                <img src="{{ url_for('main.download_file', file_id=file.id) }}" alt="{{ file.filename }}">
+                {% else %}
+                <i class="fas fa-file card-img-top text-info" style="font-size: 5rem; padding: 2rem;"></i>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ file.filename }}</h5>
+                    <p class="card-text">Located in: {{ file.folder_name or 'Root' }}</p>
+                    <a href="{{ url_for('main.dashboard', parent_folder=file.folder_name) }}" class="btn btn-primary">Go to Folder</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not files %}
+        <p>No results found.</p>
+        {% endif %}
+
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary mt-4">Back to Dashboard</a>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
