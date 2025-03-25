@@ -28,23 +28,32 @@
         .sidebar {
             width: 250px;
             height: 100vh;
-            background: white;
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
             position: fixed;
             top: 1;
             left: 0;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             padding-top: 1rem;
+            transition: all 0.3s ease;
         }
 
         .sidebar .nav-link {
             color: #333;
             font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px 0;
+            border-radius: 8px;
+            padding: 12px 20px;
         }
 
         .sidebar .nav-link:hover {
-            background: #f5f5f5;
-            border-left: 4px solid #6a11cb;
-            color: #6a11cb;
+            background: rgba(106, 17, 203, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: #6a11cb;
+            color: white !important;
         }
 
         .content {
@@ -65,11 +74,13 @@
             overflow: hidden;
             background: white;
             position: relative;
-            transition: transform 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
         }
 
         .card:hover {
-            transform: scale(1.03);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(106, 17, 203, 0.2);
         }
 
         .card img {
@@ -95,16 +106,18 @@
             margin-top: 1rem;
         }
 
-        .actions button {
-            background: none;
-            border: none;
-            color: #6a11cb;
-            font-size: 1.2rem;
-            cursor: pointer;
+        .actions button, .actions a {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .actions button:hover {
-            color: #333;
+        .actions button:hover, .actions a:hover {
+            transform: scale(1.1);
+        }
+
+        .actions button:active, .actions a:active {
+            transform: scale(0.95);
         }
 
         .upload-container {
@@ -145,42 +158,550 @@
                 margin-left: 0;
             }
         }
+
+        .file-upload-wrapper {
+            border: 2px dashed #6a11cb;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(106, 17, 203, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { border-color: #6a11cb; }
+            50% { border-color: #4e0ca3; }
+            100% { border-color: #6a11cb; }
+        }
+
+        .file-upload-wrapper:hover {
+            background: rgba(106, 17, 203, 0.1);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            cursor: pointer;
+            color: #6a11cb;
+            font-weight: bold;
+        }
+
+        .upload-label i {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .dragover {
+            animation: dragPulse 0.5s infinite;
+            background: rgba(106, 17, 203, 0.1);
+        }
+
+        @keyframes dragPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .file-card {
+            position: relative;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .file-select-checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+        }
+
+        .file-checkbox {
+            width: 20px;
+            height: 20px;
+        }
+
+        .multi-select-mode .file-select-checkbox {
+            display: block !important;
+        }
+
+        .multi-select-mode .actions {
+            display: none;
+        }
+
+        /* Folder and File animations */
+        .folder-card, .file-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Breadcrumb improvements */
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .breadcrumb-item a {
+            color: #6a11cb;
+            transition: all 0.2s ease;
+        }
+
+        .breadcrumb-item a:hover {
+            color: #4e0ca3;
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #6a11cb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Dark mode styles */
+        [data-theme="dark"] {
+            background: linear-gradient(to bottom, #1a1a1a, #2d3436);
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .card {
+            background: #2d3436;
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .sidebar {
+            background: linear-gradient(180deg, #2d3436 0%, #1a1a1a 100%);
+        }
+
+        [data-theme="dark"] .nav-link {
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .breadcrumb {
+            background: rgba(45, 52, 54, 0.9);
+        }
+
+        /* Grid animation */
+        .grid-container {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .grid-container.loading {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* File preview hover */
+        .file-preview {
+            position: fixed;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            max-width: 300px;
+            pointer-events: none;
+        }
+
+        [data-theme="dark"] .file-preview {
+            background: #2d3436;
+            color: white;
+        }
+
+        /* Progress bar */
+        .upload-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(106, 17, 203, 0.2);
+            z-index: 10000;
+        }
+
+        .upload-progress-bar {
+            height: 100%;
+            background: #6a11cb;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6a11cb;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Loading skeleton template */
+        .skeleton-card {
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .skeleton-image {
+            height: 150px;
+            width: 100%;
+        }
+
+        .skeleton-title {
+            height: 20px;
+            width: 80%;
+            margin: 10px auto;
+            border-radius: 4px;
+        }
+
+        .grid-container[data-loading="true"] {
+            min-height: 300px;
+        }
+
+        .loading-state {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .content-state {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .loading-error {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+            color: #6a11cb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .loading-error:hover {
+            transform: scale(1.05);
+        }
+
+        .loading-error i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.6; }
+        }
+
+        /* Add these new styles to the existing style block */
+        .search-form {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .search-form .form-control,
+        .search-form .form-select {
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .search-form .form-control:focus,
+        .search-form .form-select:focus {
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .search-form .btn {
+            background: #ffffff;
+            color: #6a11cb;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-form .btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        .card {
+            transform-origin: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(106, 17, 203, 0.2);
+        }
+
+        .actions button {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .actions button:hover {
+            transform: scale(1.1);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .file-preview {
+            position: fixed;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            max-width: 300px;
+            pointer-events: none;
+        }
+
+        [data-theme="dark"] .file-preview {
+            background: #2d3436;
+            color: white;
+        }
+
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        .breadcrumb-item a {
+            color: #6a11cb;
+            transition: all 0.2s ease;
+        }
+
+        .breadcrumb-item a:hover {
+            color: #4e0ca3;
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        .file-upload-wrapper {
+            border: 2px dashed #6a11cb;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(106, 17, 203, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { border-color: #6a11cb; }
+            50% { border-color: #4e0ca3; }
+            100% { border-color: #6a11cb; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="upload-progress" style="display: none;">
+        <div class="upload-progress-bar"></div>
+    </div>
+
+    <!-- File Preview -->
+    <div class="file-preview"></div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">My Storage</a>
-            <form class="d-flex ms-auto" method="GET" action="{{ url_for('main.dashboard') }}">
-                <input class="form-control me-2" type="search" name="search" placeholder="Search files..." aria-label="Search" value="{{ search }}">
-                <select class="form-select me-2" name="filter">
+            <form class="search-form d-flex ms-auto" method="GET" action="{{ url_for('main.search_results') }}">
+                <input class="form-control" type="search" name="search" placeholder="Search files..." aria-label="Search" value="{{ search }}">
+                <select class="form-select" name="filter">
                     <option value="" {% if not file_filter %}selected{% endif %}>All</option>
                     <option value="image" {% if file_filter == 'image' %}selected{% endif %}>Images</option>
                     <option value="pdf" {% if file_filter == 'pdf' %}selected{% endif %}>PDFs</option>
                     <option value="video" {% if file_filter == 'video' %}selected{% endif %}>Videos</option>
                     <option value="audio" {% if file_filter == 'audio' %}selected{% endif %}>Audio</option>
                 </select>
+                <div class="form-check d-flex align-items-center">
+                    <input class="form-check-input" type="checkbox" name="include_trash" id="includeTrash" {% if include_trash %}checked{% endif %}>
+                    <label class="form-check-label text-white ms-2" for="includeTrash">
+                        Include Trash
+                    </label>
+                </div>
                 <button class="btn btn-light" type="submit">Search</button>
             </form>
+            {% if current_user.is_admin %}
+            <ul class="navbar-nav ms-2">
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary text-white" href="{{ url_for('main.admin_panel') }}">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </a>
+                </li>
+            </ul>
+            {% endif %}
         </div>
     </nav>
 
     <!-- Sidebar -->
     <div class="sidebar">
         <nav class="nav flex-column">
-            <a class="nav-link active" href="{{ url_for('main.dashboard') }}"><i class="fas fa-home me-2"></i>Home</a>
-            <a class="nav-link" href="#"><i class="fas fa-folder me-2"></i>My Files</a>
-            <a class="nav-link" href="#"><i class="fas fa-share-alt me-2"></i>Shared with Me</a>
-            <a class="nav-link" href="#"><i class="fas fa-trash me-2"></i>Trash</a>
-            <a class="nav-link" href="#"><i class="fas fa-chart-pie me-2"></i>Storage</a>
+            <a class="nav-link {{ 'active' if not parent_folder and not shared_view }}" href="{{ url_for('main.dashboard') }}">
+                <i class="fas fa-home me-2"></i>Home
+            </a>
+            <a class="nav-link {{ 'active' if shared_view }}" href="{{ url_for('main.shared_with_me') }}">
+                <i class="fas fa-share-alt me-2"></i>Shared with Me
+            </a>
+            <a class="nav-link" href="{{ url_for('main.trash') }}">
+                <i class="fas fa-trash me-2"></i>Trash
+            </a>
+            <a class="nav-link" href="{{ url_for('main.account') }}">
+                <i class="fas fa-user me-2"></i>My Account
+            </a>
+            {% if current_user.is_admin %}
+            <a class="nav-link" href="{{ url_for('main.admin_panel') }}">
+                <i class="fas fa-user-shield me-2"></i>Admin Panel
+            </a>
+            {% endif %}
         </nav>
     </div>
 
     <!-- Content -->
     <div class="content">
         <h1>Welcome, {{ current_user.username }}!</h1>
+
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') }}">Home</a></li>
+                {% if parent_folder %}
+                    {% set path_parts = parent_folder.split('/') %}
+                    {% set current_path = '' %}
+                    {% for part in path_parts %}
+                        {% set current_path = current_path + part %}
+                        <li class="breadcrumb-item">
+                            <a href="{{ url_for('main.dashboard', parent_folder=current_path) }}">{{ part }}</a>
+                        </li>
+                        {% set current_path = current_path + '/' %}
+                    {% endfor %}
+                {% endif %}
+            </ol>
+        </nav>
+
+        <!-- Back Button -->
+        {% if parent_folder %}
+            {% set path_parts = parent_folder.split('/') %}
+            {% if path_parts|length > 1 %}
+                {% set parent_path = '/'.join(path_parts[:-1]) %}
+            {% else %}
+                {% set parent_path = '' %}
+            {% endif %}
+            <a href="{{ url_for('main.dashboard', parent_folder=parent_path) }}" class="btn btn-secondary mb-3">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        {% endif %}
+
+        <!-- Multi-select Actions -->
+        <div class="multi-select-actions mb-3" style="display: none;">
+            <button class="btn btn-danger" id="deleteSelected">
+                <i class="fas fa-trash"></i> Delete Selected
+            </button>
+            <button class="btn btn-secondary" id="cancelSelection">
+                <i class="fas fa-times"></i> Cancel Selection
+            </button>
+            <span class="ms-2" id="selectedCount"></span>
+        </div>
 
         <!-- Integrated Upload and Folder Creation -->
         <div class="upload-container">
@@ -190,89 +711,156 @@
                 <input type="text" name="folder_name" placeholder="New Folder Name" required>
                 <button type="submit">Create Folder</button>
             </form>
-            <form action="{{ url_for('main.upload_file') }}" method="POST" enctype="multipart/form-data" class="d-inline">
+            <form action="{{ url_for('main.upload_file') }}" method="POST" enctype="multipart/form-data" class="d-inline" id="uploadForm">
                 {{ form.hidden_tag() }}
                 <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
-                <input type="file" name="file" required>
-                <button type="submit">Upload File</button>
+                <div class="file-upload-wrapper" id="dropZone">
+                    <input type="file" name="files[]" multiple id="fileInput">
+                    <label for="fileInput" class="upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Drop files here or click to select</span>
+                    </label>
+                </div>
+                <button type="submit" id="uploadButton" class="btn btn-primary" style="display: none;">Upload Files</button>
             </form>
         </div>
 
-        <!-- Grid View -->
-        <div class="grid-container">
-            {% for folder in folders %}
-            <div class="card folder-card">
-                <a href="{{ url_for('main.dashboard', parent_folder=folder) }}">
-                    <i class="fas fa-folder card-img-top text-warning" style="font-size: 5rem; padding: 2rem;"></i>
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title">{{ folder }}</h5>
-                    <div class="actions">
-                        <a href="{{ url_for('main.dashboard', parent_folder=folder) }}"><i class="fas fa-eye"></i></a>
-                        <button class="btn btn-primary rename-folder" data-folder-name="{{ folder }}" data-parent-folder="{{ parent_folder }}"><i class="fas fa-edit"></i></button>
-                        <form action="{{ url_for('main.delete_folder') }}" method="POST" class="d-inline">
-                            {{ form.hidden_tag() }}
-                            <input type="hidden" name="folder_name" value="{{ folder }}">
-                            <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
-                            <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
-                        </form>
-                    </div>
-                </div>
+        <!-- Update the grid container to include loading state -->
+        <div class="grid-container" id="gridContainer" data-loading="true">
+            <div class="loading-state" id="loadingState">
+                <!-- Skeleton cards will be inserted here -->
             </div>
-            {% endfor %}
-
-            {% for file in files %}
-            <div class="col">
-                <div class="card">
-                    {% if file.file_type.startswith('image/') %}
-                    <img src="{{ url_for('main.download_file', file_id=file.id) }}" alt="{{ file.filename }}">
-                    {% else %}
-                    <i class="fas fa-file card-img-top text-info" style="font-size: 5rem; padding: 2rem;"></i>
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ file.filename }}</h5>
-                        <div class="actions">
-                            <a href="{{ url_for('main.download_file', file_id=file.id) }}" class="btn btn-success"><i class="fas fa-download"></i></a>
-                            <!-- Rename Button to Open Modal -->
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#renameModal{{ file.id }}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <form action="{{ url_for('main.delete_file', file_id=file.id) }}" method="POST" class="d-inline">
-                                {{ form.hidden_tag() }}
-                                <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
-                                <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
-                            </form>
+            <div class="content-state" id="contentState" style="display: none;">
+                <!-- Original content -->
+                {% for folder in folders %}
+                    {% if folder != 'Trash' %}
+                    <div class="card folder-card">
+                        <a href="{{ url_for('main.dashboard', parent_folder=folder) }}">
+                            <i class="fas fa-folder card-img-top text-warning" style="font-size: 5rem; padding: 2rem;"></i>
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ folder }}</h5>
+                            <div class="actions">
+                                <a href="{{ url_for('main.dashboard', parent_folder=folder) }}"><i class="fas fa-eye"></i></a>
+                                <button class="btn btn-primary rename-folder" data-folder-name="{{ folder }}" data-parent-folder="{{ parent_folder }}"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-info share-folder" data-bs-toggle="modal" data-bs-target="#shareFolderModal{{ loop.index }}" data-folder-name="{{ folder }}" data-parent-folder="{{ parent_folder }}">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <form action="{{ url_for('main.delete_folder') }}" method="POST" class="d-inline">
+                                    {{ form.hidden_tag() }}
+                                    <input type="hidden" name="folder_name" value="{{ folder }}">
+                                    <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                                    <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            
-                <!-- Rename Modal -->
-                <div class="modal fade" id="renameModal{{ file.id }}" tabindex="-1" aria-labelledby="renameModalLabel{{ file.id }}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form action="{{ url_for('main.rename_file', file_id=file.id) }}" method="POST">
-                                {{ form.hidden_tag() }}
-                                <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                    {% endif %}
+                {% endfor %}
+
+                {% for file in files %}
+                <div class="col">
+                    <div class="card file-card" data-file-id="{{ file.id }}">
+                        <div class="file-select-checkbox" style="display: none;">
+                            <input type="checkbox" class="form-check-input file-checkbox" data-file-id="{{ file.id }}">
+                        </div>
+                        {% if file.file_type.startswith('image/') %}
+                        <img src="{{ url_for('main.download_file', file_id=file.id) }}" alt="{{ file.filename }}">
+                        {% else %}
+                        <i class="fas fa-file card-img-top text-info" style="font-size: 5rem; padding: 2rem;"></i>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ file.filename }}</h5>
+                            <div class="actions">
+                                <a href="{{ url_for('main.download_file', file_id=file.id) }}" class="btn btn-success"><i class="fas fa-download"></i></a>
+                                <button class="btn btn-primary rename-file" data-file-id="${file.id}"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-info share-file" data-bs-toggle="modal" data-bs-target="#shareModal${file.id}" data-file-id="${file.id}" data-shared="${file.shared ? 'True' : 'False'}">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <form action="/delete_file/${file.id}" method="POST" class="delete-form">
+                                    {{ form.hidden_tag() }}
+                                    <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                                    <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                </form>                            
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Rename Modal -->
+                    <div class="modal fade" id="renameModal{{ file.id }}" tabindex="-1" aria-labelledby="renameModalLabel{{ file.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form action="{{ url_for('main.rename_file', file_id=file.id) }}" method="POST">
+                                    {{ form.hidden_tag() }}
+                                    <input type="hidden" name="parent_folder" value="{{ parent_folder }}">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="renameModalLabel{{ file.id }}">Rename File</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="newFilename{{ file.id }}" class="form-label">New Filename</label>
+                                            <input type="text" class="form-control" id="newFilename{{ file.id }}" name="new_filename" value="{{ file.filename }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Rename</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Share Modal -->
+                    <div class="modal fade" id="shareModal{{ file.id }}" tabindex="-1" aria-labelledby="shareModalLabel{{ file.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="renameModalLabel{{ file.id }}">Rename File</h5>
+                                    <h5 class="modal-title" id="shareModalLabel{{ file.id }}">Share "{{ file.filename }}"</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="newFilename{{ file.id }}" class="form-label">New Filename</label>
-                                        <input type="text" class="form-control" id="newFilename{{ file.id }}" name="new_filename" value="{{ file.filename }}" required>
+                                    <div class="share-options mb-3">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="shareType${file.id}" id="publicOption${file.id}" value="public">
+                                            <label class="form-check-label" for="publicOption${file.id}">Public Link</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="shareType${file.id}" id="userOption${file.id}" value="user">
+                                            <label class="form-check-label" for="userOption${file.id}">Share with User</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="userShareOptions{{ file.id }}" class="d-none">
+                                        <div class="mb-3">
+                                            <label for="recipientEmail{{ file.id }}" class="form-label">Recipient Email</label>
+                                            <input type="email" class="form-control" id="recipientEmail{{ file.id }}" placeholder="Enter email address">
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="shareUrlContainer{{ file.id }}" class="d-none">
+                                        <div class="mb-3">
+                                            <label for="shareUrl{{ file.id }}" class="form-label">Shareable Link</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="shareUrl{{ file.id }}" readonly>
+                                                <button class="btn btn-outline-secondary copy-link-btn" type="button" data-url-id="shareUrl{{ file.id }}">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Rename</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary share-confirm-btn" data-file-id="{{ file.id }}">Share</button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
+                {% endfor %}            
             </div>
-            {% endfor %}            
         </div>
     </div>
 
@@ -309,95 +897,523 @@
         </div>
     </div>
 
+    <!-- Add skeleton loading template -->
+    <template id="skeletonTemplate">
+        <div class="card skeleton-card">
+            <div class="skeleton skeleton-image"></div>
+            <div class="skeleton skeleton-title"></div>
+        </div>
+    </template>
+
+    <!-- Share Folder Modals -->
+    {% for folder in folders %}
+        {% if folder != 'Trash' %}
+        <div class="modal fade" id="shareFolderModal{{ loop.index }}" tabindex="-1" aria-labelledby="shareFolderModalLabel{{ loop.index }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="shareFolderModalLabel{{ loop.index }}">Share {{ folder }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="share-options mb-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="shareFolderType{{ loop.index }}" id="folderPublicOption{{ loop.index }}" value="public" checked>
+                                <label class="form-check-label" for="folderPublicOption{{ loop.index }}">Public Link</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="shareFolderType{{ loop.index }}" id="folderUserOption{{ loop.index }}" value="user">
+                                <label class="form-check-label" for="folderUserOption{{ loop.index }}">Share with User</label>
+                            </div>
+                        </div>
+                        
+                        <div id="folderUserShareOptions{{ loop.index }}" class="d-none">
+                            <div class="mb-3">
+                                <label for="folderRecipientEmail{{ loop.index }}" class="form-label">Recipient Email</label>
+                                <input type="email" class="form-control" id="folderRecipientEmail{{ loop.index }}" placeholder="Enter email address">
+                            </div>
+                        </div>
+                        
+                        <div id="folderShareUrlContainer{{ loop.index }}" class="d-none">
+                            <div class="mb-3">
+                                <label for="folderShareUrl{{ loop.index }}" class="form-label">Share URL</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="folderShareUrl{{ loop.index }}" readonly>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('folderShareUrl{{ loop.index }}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="toggleFolderSharing('{{ folder }}', '{{ parent_folder }}', {{ loop.index }})">
+                            Share Folder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Updated Actions for Rename and Share
-        document.addEventListener('DOMContentLoaded', () => {
-            const actionModal = new bootstrap.Modal(document.getElementById('actionModal'));
-            const actionLabel = document.getElementById('actionModalLabel');
-            const renameSection = document.getElementById('renameSection');
-            const shareSection = document.getElementById('shareSection');
-            const renameInput = document.getElementById('renameInput');
-            const shareToggle = document.getElementById('shareToggle');
-            const shareUrl = document.getElementById('shareUrl');
-            const confirmAction = document.getElementById('confirmAction');
-        
-            let currentAction = null;
-            let currentFileId = null;
-        
-            // Handle Rename Button
-            document.querySelectorAll('.rename-file').forEach(button => {
-                button.addEventListener('click', () => {
-                    currentFileId = button.dataset.fileId;
-                    currentAction = 'rename';
-                    actionLabel.textContent = 'Rename File';
-                    renameInput.value = button.dataset.fileName;
-        
-                    renameSection.classList.remove('d-none');
-                    shareSection.classList.add('d-none');
-                    actionModal.show();
-                });
-            });
-        
-            // Handle Share Button
-            document.querySelectorAll('.share-file').forEach(button => {
-                button.addEventListener('click', () => {
-                    currentFileId = button.dataset.fileId;
-                    currentAction = 'share';
-                    actionLabel.textContent = 'Share File';
-                    shareToggle.checked = button.dataset.shared === 'True';
-                    shareUrl.value = shareToggle.checked ? window.location.origin + '/download_file/' + currentFileId : '';
-        
-                    renameSection.classList.add('d-none');
-                    shareSection.classList.remove('d-none');
-                    actionModal.show();
-                });
-            });
-        
-            // Confirm Action Button
-            confirmAction.addEventListener('click', async () => {
-                if (currentAction === 'rename') {
-                    const newFilename = renameInput.value;
-                    try {
-                        const response = await fetch(`/rename_file/${currentFileId}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ new_filename: newFilename })
-                        });
-        
-                        if (response.ok) {
-                            alert('File renamed successfully.');
-                            location.reload();
-                        } else {
-                            const data = await response.json();
-                            alert('Error: ' + data.error);
-                        }
-                    } catch (err) {
-                        console.error('Rename failed:', err);
-                    }
-                } else if (currentAction === 'share') {
-                    try {
-                        const response = await fetch(`/toggle_sharing/${currentFileId}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-        
-                        const data = await response.json();
-                        if (response.ok) {
-                            shareUrl.value = data.shared ? data.url : '';
-                            alert(data.shared ? 'Sharing enabled. Link copied!' : 'Sharing disabled.');
-                            if (data.shared) navigator.clipboard.writeText(data.url);
-                        } else {
-                            alert('Error toggling sharing.');
-                        }
-                    } catch (err) {
-                        console.error('Share toggle failed:', err);
-                    }
+        // Define global functions first
+        function toggleFolderSharing(folderName, parentFolder, index) {
+            const shareType = document.querySelector(`input[name="shareFolderType${index}"]:checked`).value;
+            const shareButton = document.querySelector(`#shareFolderModal${index} .btn-primary`);
+            
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('folder_path', folderName);
+            formData.append('parent_folder', parentFolder);
+            formData.append('share_type', shareType);
+            formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+            
+            // If sharing with a specific user, include recipient email
+            if (shareType === 'user') {
+                const recipientEmail = document.getElementById(`folderRecipientEmail${index}`).value;
+                if (!recipientEmail) {
+                    alert('Please enter a recipient email address.');
+                    return;
                 }
-                actionModal.hide();
+                formData.append('recipient_email', recipientEmail);
+            }
+            
+            // Update button state
+            shareButton.disabled = true;
+            shareButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            // Send share request
+            fetch('/toggle_folder_sharing', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else if (data.shared) {
+                    // Show the share URL
+                    const shareUrlContainer = document.getElementById(`folderShareUrlContainer${index}`);
+                    const shareUrlInput = document.getElementById(`folderShareUrl${index}`);
+                    shareUrlContainer.classList.remove('d-none');
+                    shareUrlInput.value = data.url;
+                    shareButton.innerHTML = 'Unshare Folder';
+                } else {
+                    // Folder was unshared
+                    const shareUrlContainer = document.getElementById(`folderShareUrlContainer${index}`);
+                    shareUrlContainer.classList.add('d-none');
+                    shareButton.innerHTML = 'Share Folder';
+                }
+                shareButton.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your request.');
+                shareButton.disabled = false;
+                shareButton.innerHTML = 'Share Folder';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const loadingState = document.getElementById('loadingState');
+            const contentState = document.getElementById('contentState');
+            const gridContainer = document.getElementById('gridContainer');
+            const fileInput = document.getElementById('fileInput');
+            const uploadButton = document.getElementById('uploadButton');
+            const dropZone = document.getElementById('dropZone');
+            const uploadForm = document.getElementById('uploadForm');
+            const currentParentFolder = '{{ parent_folder }}';
+            
+            // Flag to track upload in progress
+            let isUploading = false;
+            
+            // Create skeleton loading UI
+            const createSkeletons = (count) => {
+                let html = '';
+                for (let i = 0; i < count; i++) {
+                    html += `
+                        <div class="skeleton-card">
+                            <div class="skeleton skeleton-img"></div>
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-text"></div>
+                        </div>
+                    `;
+                }
+                return html;
+            };
+            
+            // Load folders and files from the server
+            const loadContent = async () => {
+                try {
+                    // Show loading state
+                    contentState.style.display = 'none';
+                    loadingState.style.display = 'grid';
+                    loadingState.innerHTML = createSkeletons(8);
+                    
+                    // Fetch data from server
+                    const response = await fetch(`/dashboard/async_load?parent_folder=${encodeURIComponent(currentParentFolder)}`);
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to load content');
+                    }
+                    
+                    // Process folders
+                    let foldersHtml = '';
+                    data.folders.forEach((folder, index) => {
+                        if (folder !== 'Trash') {
+                            foldersHtml += `
+                                <div class="card folder-card">
+                                    <a href="/dashboard?parent_folder=${encodeURIComponent(currentParentFolder ? currentParentFolder + '/' + folder : folder)}">
+                                        <i class="fas fa-folder card-img-top text-warning" style="font-size: 5rem; padding: 2rem;"></i>
+                                    </a>
+                                    <div class="card-body">
+                                        <h5 class="card-title">${folder}</h5>
+                                        <div class="actions">
+                                            <a href="/dashboard?parent_folder=${encodeURIComponent(currentParentFolder ? currentParentFolder + '/' + folder : folder)}"><i class="fas fa-eye"></i></a>
+                                            <button class="btn btn-primary rename-folder" data-folder-name="${folder}" data-parent-folder="${currentParentFolder}"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-info share-folder" data-bs-toggle="modal" data-bs-target="#shareFolderModal${index+1}" data-folder-name="${folder}" data-parent-folder="${currentParentFolder}"><i class="fas fa-share-alt"></i></button>
+                                            <form action="/delete_folder" method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="${document.querySelector('input[name="csrf_token"]').value}">
+                                                <input type="hidden" name="folder_name" value="${folder}">
+                                                <input type="hidden" name="parent_folder" value="${currentParentFolder}">
+                                                <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                    
+                    // Process files
+                    let filesHtml = '';
+                    data.files.forEach(file => {
+                        filesHtml += `
+                            <div class="card file-card" data-file-id="${file.id}">
+                                <div class="file-select-checkbox" style="display: none;">
+                                    <input type="checkbox" class="form-check-input file-checkbox" data-file-id="${file.id}">
+                                </div>
+                                ${file.file_type.startsWith('image/') 
+                                ? `<img src="${file.download_url}" alt="${file.filename}">`
+                                : `<i class="fas fa-file card-img-top text-info" style="font-size: 5rem; padding: 2rem;"></i>`
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title">${file.filename}</h5>
+                                    <div class="actions">
+                                        <a href="${file.download_url}" class="btn btn-success"><i class="fas fa-download"></i></a>
+                                        <button class="btn btn-primary rename-file" data-file-id="${file.id}"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-info share-file" data-bs-toggle="modal" data-bs-target="#shareModal${file.id}" data-file-id="${file.id}" data-shared="${file.shared ? 'True' : 'False'}">
+                                            <i class="fas fa-share-alt"></i>
+                                        </button>
+                                        <form action="/delete_file/${file.id}" method="POST" class="delete-form">
+                                            <input type="hidden" name="csrf_token" value="${document.querySelector('input[name="csrf_token"]').value}">
+                                            <input type="hidden" name="parent_folder" value="${currentParentFolder}">
+                                            <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Create share modal for dynamically loaded file
+                        const shareModalHtml = `
+                        <div class="modal fade" id="shareModal${file.id}" tabindex="-1" aria-labelledby="shareModalLabel${file.id}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="shareModalLabel${file.id}">Share ${file.filename}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="share-options mb-3">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="shareType${file.id}" id="publicOption${file.id}" value="public">
+                                                <label class="form-check-label" for="publicOption${file.id}">Public Link</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="shareType${file.id}" id="userOption${file.id}" value="user">
+                                                <label class="form-check-label" for="userOption${file.id}">Share with User</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="userShareOptions${file.id}" class="d-none">
+                                            <div class="mb-3">
+                                                <label for="recipientEmail${file.id}" class="form-label">Recipient Email</label>
+                                                <input type="email" class="form-control" id="recipientEmail${file.id}" placeholder="Enter email address">
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="shareUrlContainer${file.id}" class="d-none">
+                                            <div class="mb-3">
+                                                <label for="shareUrl${file.id}" class="form-label">Share URL</label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="shareUrl${file.id}" readonly>
+                                                    <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('shareUrl${file.id}')">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary" onclick="toggleSharing(${file.id})">
+                                            ${file.shared ? 'Stop Sharing' : 'Share File'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                        document.body.insertAdjacentHTML('beforeend', shareModalHtml);
+                    });
+                    
+                    // Update the DOM with new content
+                    contentState.innerHTML = foldersHtml + filesHtml;
+                    
+                    // Show content
+                    loadingState.style.display = 'none';
+                    contentState.style.display = 'grid';
+                    
+                    // Add event listeners for share and rename buttons
+                    document.querySelectorAll('.share-file').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const fileId = this.getAttribute('data-file-id');
+                            const isShared = this.getAttribute('data-shared') === 'True';
+                            
+                            if (isShared) {
+                                document.getElementById(`shareUrlContainer${fileId}`).classList.remove('d-none');
+                                document.querySelector(`#shareModal${fileId} .btn-primary`).textContent = 'Stop Sharing';
+                            } else {
+                                document.getElementById(`shareUrlContainer${fileId}`).classList.add('d-none');
+                                document.querySelector(`#shareModal${fileId} .btn-primary`).textContent = 'Share File';
+                            }
+                        });
+                    });
+                    
+                    // Setup folder share option toggles
+                    const folderShareRadios = document.querySelectorAll('input[name^="shareFolderType"]');
+                    folderShareRadios.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            const index = this.name.replace('shareFolderType', '');
+                            const userOptions = document.getElementById(`folderUserShareOptions${index}`);
+                            
+                            if (this.value === 'user') {
+                                userOptions.classList.remove('d-none');
+                            } else {
+                                userOptions.classList.add('d-none');
+                            }
+                        });
+                    });
+                    
+                    // Toggle file sharing options
+                    document.querySelectorAll('input[name^="shareType"]').forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            const fileId = this.name.replace('shareType', '');
+                            const userOptions = document.getElementById(`userShareOptions${fileId}`);
+                            
+                            if (this.value === 'user') {
+                                userOptions.classList.remove('d-none');
+                            } else {
+                                userOptions.classList.add('d-none');
+                            }
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading content:', error);
+                    contentState.innerHTML = `<div class="alert alert-danger">Error loading content. Please refresh the page and try again.</div>`;
+                    contentState.style.display = 'block';
+                    loadingState.style.display = 'none';
+                }
+            };
+            
+            // Load content when page is ready
+            loadContent();
+            
+            // Handle file drag events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropZone.classList.add('dragover');
+            }
+            
+            function unhighlight() {
+                dropZone.classList.remove('dragover');
+            }
+            
+            // Show upload button when files are selected
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length > 0) {
+                    uploadButton.style.display = 'block';
+                    uploadButton.textContent = `Upload ${fileInput.files.length} ${fileInput.files.length === 1 ? 'File' : 'Files'}`;
+                } else {
+                    uploadButton.style.display = 'none';
+                }
+            });
+            
+            // Handle file drop
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('dragover');
+                
+                const items = e.dataTransfer.items;
+                const files = e.dataTransfer.files;
+
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    uploadButton.style.display = 'block';
+                    uploadButton.textContent = `Upload ${files.length} ${files.length === 1 ? 'File' : 'Files'}`;
+                }
+            });
+
+            // Handle form submission
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Prevent duplicate submissions
+                if (isUploading) {
+                    console.log('Upload already in progress');
+                    return;
+                }
+                
+                isUploading = true;
+                
+                const formData = new FormData();
+                
+                // Add the parent folder
+                formData.append('parent_folder', '{{ parent_folder }}');
+                
+                // Add CSRF token
+                formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+                
+                // Add all selected files
+                for (let file of fileInput.files) {
+                    formData.append('files[]', file);
+                }
+
+                // Show upload progress
+                uploadButton.disabled = true;
+                uploadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+                fetch('{{ url_for("main.upload_file") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    isUploading = false;
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                        uploadButton.disabled = false;
+                        uploadButton.textContent = 'Upload Files';
+                    }
+                })
+                .catch(error => {
+                    isUploading = false;
+                    console.error('Error:', error);
+                    alert('Upload failed');
+                    uploadButton.disabled = false;
+                    uploadButton.textContent = 'Upload Files';
+                });
             });
         });
+
+        // File sharing functionality
+        function toggleSharing(fileId) {
+            const shareType = document.querySelector(`input[name="shareType${fileId}"]:checked`).value;
+            const recipientEmail = document.getElementById(`recipientEmail${fileId}`)?.value;
+            const shareButton = document.querySelector(`#shareModal${fileId} .btn-primary`);
+            
+            // If sharing with a user, make sure email is provided
+            if (shareType === 'user' && !recipientEmail) {
+                alert('Please enter a recipient email address.');
+                return;
+            }
+            
+            // Update button state
+            shareButton.disabled = true;
+            shareButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('share_type', shareType);
+            formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+            
+            if (shareType === 'user') {
+                formData.append('recipient_email', recipientEmail);
+            }
+            
+            // Send AJAX request
+            fetch(`/toggle_sharing/${fileId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else if (data.shared) {
+                    // Show the share URL
+                    const shareUrlContainer = document.getElementById(`shareUrlContainer${fileId}`);
+                    const shareUrlInput = document.getElementById(`shareUrl${fileId}`);
+                    shareUrlContainer.classList.remove('d-none');
+                    shareUrlInput.value = data.url;
+                    shareButton.textContent = 'Stop Sharing';
+                } else {
+                    // File was unshared
+                    const shareUrlContainer = document.getElementById(`shareUrlContainer${fileId}`);
+                    shareUrlContainer.classList.add('d-none');
+                    shareButton.textContent = 'Share File';
+                }
+                shareButton.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your request.');
+                shareButton.disabled = false;
+            });
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const button = element.nextElementSibling;
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+            }, 1500);
+        }
     </script>        
 </body>
 </html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Storage System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #6a11cb;
+            color: white;
+        }
+        .navbar .navbar-brand {
+            font-weight: bold;
+            color: white;
+        }
+        .admin-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 90%;
+        }
+        .table {
+            margin-top: 1rem;
+        }
+        .badge {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.6rem;
+        }
+        .status-toggle {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .status-toggle:hover {
+            opacity: 0.8;
+        }
+        .status-toggle.enabled {
+            background: #198754;
+        }
+        .status-toggle.disabled {
+            background: #dc3545;
+        }
+        .btn-reset {
+            background-color: #fd7e14;
+            color: white;
+        }
+        .btn-reset:hover {
+            background-color: #e76b00;
+            color: white;
+        }
+        .badge-admin {
+            background-color: #6a11cb;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">
+                <i class="fas fa-server me-2"></i>
+                Storage System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('main.admin_panel') }}">
+                            <i class="fas fa-user-shield me-1"></i>
+                            Admin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Panel -->
+    <div class="container">
+        <div class="admin-panel">
+            <h1>
+                <i class="fas fa-user-shield me-2"></i>
+                Admin Panel
+            </h1>
+            <p class="text-muted">Manage users and system settings</p>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- User Management -->
+            <h3 class="mt-4">
+                <i class="fas fa-users me-2"></i>
+                User Management
+            </h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Permissions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>
+                                    {{ user.username }}
+                                    {% if user.is_admin %}
+                                    <span class="badge badge-admin">
+                                        <i class="fas fa-crown me-1"></i>
+                                        Admin
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% if user.is_whitelisted %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Whitelisted
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-times-circle me-1"></i>
+                                            Not Whitelisted
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <form action="{{ url_for('main.toggle_whitelist', user_id=user.id) }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            {% if user.is_whitelisted %}
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-ban me-1"></i>
+                                                    Disable Whitelist
+                                                </button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-check me-1"></i>
+                                                    Enable Whitelist
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                        
+                                        <form action="{{ url_for('main.reset_password', user_id=user.id) }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-reset" onclick="return confirm('Are you sure you want to reset the password for {{ user.username }} to Temp123!?')">
+                                                <i class="fas fa-key me-1"></i>
+                                                Reset Password
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- File Type Management Section -->
+            <h3 class="mt-5">
+                <i class="fas fa-file-alt me-2"></i>
+                Allowed File Types
+            </h3>
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Current Allowed File Types
+                </div>
+                <div class="card-body">
+                    <p>The following file types are currently allowed for non-whitelisted users:</p>
+                    <div class="mb-3">
+                        {% for file_type in allowed_file_types %}
+                            <span class="badge bg-info me-2 mb-2">.{{ file_type }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        <strong>Note:</strong> Whitelisted users can upload any file type. Use the whitelist feature to grant specific users permission to upload all file types.
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ url_for('main.admin_logs') }}" class="btn btn-info">
+                    <i class="fas fa-list-alt me-1"></i>
+                    View Audit Logs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

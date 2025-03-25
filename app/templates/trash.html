@@ -43,11 +43,23 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <nav class="nav flex-column">
-            <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="fas fa-home me-2"></i>Home</a>
-            <a class="nav-link" href="#"><i class="fas fa-folder me-2"></i>My Files</a>
-            <a class="nav-link" href="#"><i class="fas fa-share-alt me-2"></i>Shared with Me</a>
-            <a class="nav-link active" href="{{ url_for('main.trash') }}"><i class="fas fa-trash me-2"></i>Trash</a>
-            <a class="nav-link" href="#"><i class="fas fa-chart-pie me-2"></i>Storage</a>
+            <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                <i class="fas fa-home me-2"></i>Home
+            </a>
+            <a class="nav-link" href="{{ url_for('main.shared_with_me') }}">
+                <i class="fas fa-share-alt me-2"></i>Shared with Me
+            </a>
+            <a class="nav-link active" href="{{ url_for('main.trash') }}">
+                <i class="fas fa-trash me-2"></i>Trash
+            </a>
+            <a class="nav-link" href="{{ url_for('main.account') }}">
+                <i class="fas fa-user me-2"></i>My Account
+            </a>
+            {% if current_user.is_admin %}
+            <a class="nav-link" href="{{ url_for('main.admin_panel') }}">
+                <i class="fas fa-user-shield me-2"></i>Admin Panel
+            </a>
+            {% endif %}
         </nav>
     </div>
 
@@ -66,10 +78,15 @@
                     <h5 class="card-title">{{ file.filename }}</h5>
                     <p class="card-text">Deleted on: {{ file.upload_time.strftime('%Y-%m-%d') }}</p>
                     <div class="actions">
-                        <form action="{{ url_for('main.restore_file', file_id=file.id) }}" method="POST" class="d-inline">
+                        <!-- Restore File Form -->
+                        <form action="{{ url_for('main.restore_file', file_id=file.id) }}" method="POST">
+                            {{ form.hidden_tag() }} <!-- This generates the CSRF token -->
                             <button class="btn btn-success"><i class="fas fa-undo"></i> Restore</button>
                         </form>
-                        <form action="{{ url_for('main.permanently_delete_file', file_id=file.id) }}" method="POST" class="d-inline">
+
+                        <!-- Permanently Delete File Form -->
+                        <form action="{{ url_for('main.permanently_delete_file', file_id=file.id) }}" method="POST">
+                            {{ form.hidden_tag() }} <!-- This generates the CSRF token -->
                             <button class="btn btn-danger"><i class="fas fa-trash"></i> Permanently Delete</button>
                         </form>
                     </div>

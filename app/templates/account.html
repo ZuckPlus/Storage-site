@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: #6a11cb;
+            color: white;
+        }
+
+        .navbar .navbar-brand {
+            font-weight: bold;
+            color: white;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+            position: fixed;
+            top: 1;
+            left: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            padding-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px 0;
+            border-radius: 8px;
+            padding: 12px 20px;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(106, 17, 203, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background: #6a11cb;
+            color: white !important;
+        }
+
+        .content {
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        .account-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .account-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .account-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .account-avatar {
+            width: 80px;
+            height: 80px;
+            background: #6a11cb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1.5rem;
+        }
+
+        .account-avatar i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .account-info h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .account-info p {
+            margin: 0;
+            color: #666;
+        }
+
+        .form-control:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 0.2rem rgba(106, 17, 203, 0.25);
+        }
+
+        .btn-primary {
+            background: #6a11cb;
+            border: none;
+            padding: 0.5rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #5b0fb6;
+            transform: translateY(-2px);
+        }
+
+        .password-requirements {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1rem;
+        }
+
+        .password-requirements ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .password-requirements li {
+            margin-bottom: 0.5rem;
+        }
+
+        .password-requirements i {
+            margin-right: 0.5rem;
+            color: #6a11cb;
+        }
+
+        .alert {
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">My Storage</a>
+            {% if current_user.is_admin %}
+            <ul class="navbar-nav ms-2">
+                <li class="nav-item">
+                    <a class="nav-link btn btn-primary text-white" href="{{ url_for('main.admin_panel') }}">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </a>
+                </li>
+            </ul>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                <i class="fas fa-home me-2"></i>Home
+            </a>
+            <a class="nav-link" href="{{ url_for('main.shared_with_me') }}">
+                <i class="fas fa-share-alt me-2"></i>Shared with Me
+            </a>
+            <a class="nav-link" href="{{ url_for('main.trash') }}">
+                <i class="fas fa-trash me-2"></i>Trash
+            </a>
+            <a class="nav-link active" href="{{ url_for('main.account') }}">
+                <i class="fas fa-user me-2"></i>My Account
+            </a>
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="account-card">
+            <div class="account-header">
+                <div class="account-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="account-info">
+                    <h2>{{ current_user.username }}</h2>
+                    <p>{{ current_user.email }}</p>
+                    {% if current_user.is_admin %}
+                    <span class="badge bg-primary mt-2">Administrator</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h3 class="mb-4">Change Password</h3>
+            <form action="{{ url_for('main.change_password') }}" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label for="current_password" class="form-label">Current Password</label>
+                    {{ form.current_password(class="form-control", id="current_password") }}
+                </div>
+                <div class="mb-3">
+                    <label for="new_password" class="form-label">New Password</label>
+                    {{ form.new_password(class="form-control", id="new_password") }}
+                </div>
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                    {{ form.confirm_password(class="form-control", id="confirm_password") }}
+                </div>
+
+                <div class="password-requirements">
+                    <h6>Password Requirements:</h6>
+                    <ul>
+                        <li><i class="fas fa-check"></i>At least 8 characters long</li>
+                        <li><i class="fas fa-check"></i>Contains at least one uppercase letter</li>
+                        <li><i class="fas fa-check"></i>Contains at least one lowercase letter</li>
+                        <li><i class="fas fa-check"></i>Contains at least one number</li>
+                        <li><i class="fas fa-check"></i>Contains at least one special character</li>
+                    </ul>
+                </div>
+
+                {{ form.submit(class="btn btn-primary mt-3") }}
+            </form>
+        </div>
+
+        <div class="account-card">
+            <h3 class="mb-4">Account Statistics</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="fas fa-file fa-2x mb-2 text-primary"></i>
+                        <h4>{{ total_files }}</h4>
+                        <p>Total Files</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="fas fa-share-alt fa-2x mb-2 text-success"></i>
+                        <h4>{{ total_shares }}</h4>
+                        <p>Shared Files</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="fas fa-hdd fa-2x mb-2 text-warning"></i>
+                        <h4>{{ storage_used }}</h4>
+                        <p>Storage Used</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

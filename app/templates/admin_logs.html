@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - Storage System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #6a11cb;
+            color: white;
+        }
+        .navbar .navbar-brand {
+            font-weight: bold;
+            color: white;
+        }
+        .admin-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 95%;
+        }
+        .table {
+            margin-top: 1rem;
+        }
+        .badge {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.6rem;
+        }
+        .badge-admin {
+            background-color: #6a11cb;
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .log-table {
+            font-size: 0.9rem;
+        }
+        .log-details {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .log-details:hover {
+            white-space: normal;
+            overflow: visible;
+        }
+        .badge-login { background-color: #28a745; color: white; }
+        .badge-logout { background-color: #6c757d; color: white; }
+        .badge-file_upload { background-color: #17a2b8; color: white; }
+        .badge-toggle_whitelist { background-color: #6a11cb; color: white; }
+        .badge-error { background-color: #dc3545; color: white; }
+        .badge-security_violation { background-color: #dc3545; color: white; }
+        .badge-access_denied { background-color: #fd7e14; color: white; }
+        .badge-upload_blocked { background-color: #fd7e14; color: white; }
+        .badge-upload_error { background-color: #dc3545; color: white; }
+        .badge-view_logs { background-color: #20c997; color: white; }
+        .badge-default { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.dashboard') }}">
+                <i class="fas fa-server me-2"></i>
+                Storage System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.admin_panel') }}">
+                            <i class="fas fa-user-shield me-1"></i>
+                            Admin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('main.admin_logs') }}">
+                            <i class="fas fa-list-alt me-1"></i>
+                            Logs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Audit Logs Panel -->
+    <div class="container-fluid">
+        <div class="admin-panel">
+            <h1>
+                <i class="fas fa-list-alt me-2"></i>
+                Audit Logs
+            </h1>
+            <p class="text-muted">System activity logs for security and troubleshooting</p>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h5><i class="fas fa-filter me-2"></i>Filter Logs</h5>
+                <form action="{{ url_for('main.admin_logs') }}" method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="action" class="form-label">Action</label>
+                        <select class="form-select" id="action" name="action">
+                            <option value="">All Actions</option>
+                            {% for action in actions %}
+                                <option value="{{ action }}" {% if current_action == action %}selected{% endif %}>
+                                    {{ action | replace('_', ' ') | title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="user_id" class="form-label">User</label>
+                        <select class="form-select" id="user_id" name="user_id">
+                            <option value="">All Users</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}" {% if current_user_filter|int == user.id %}selected{% endif %}>
+                                    {{ user.username }} ({{ user.email }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="date_from" class="form-label">From Date</label>
+                        <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="date_to" class="form-label">To Date</label>
+                        <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search me-1"></i> Apply Filters
+                        </button>
+                        <a href="{{ url_for('main.admin_logs') }}" class="btn btn-secondary">
+                            <i class="fas fa-undo me-1"></i> Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Logs Table -->
+            <div class="table-responsive">
+                <table class="table table-hover log-table">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>IP Address</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs.items %}
+                            <tr>
+                                <td>{{ log.id }}</td>
+                                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    {% set log_user = users|selectattr('id', 'eq', log.user_id)|first %}
+                                    {% if log_user %}
+                                        {{ log_user.username }}
+                                        {% if log_user.is_admin %}
+                                        <span class="badge badge-admin">
+                                            <i class="fas fa-crown me-1"></i>
+                                            Admin
+                                        </span>
+                                        {% endif %}
+                                    {% else %}
+                                        User ID: {{ log.user_id }} (deleted)
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-{{ log.action }} {% if log.action not in ['login', 'logout', 'file_upload', 'toggle_whitelist', 'error', 'security_violation', 'access_denied', 'upload_blocked', 'upload_error', 'view_logs'] %}badge-default{% endif %}">
+                                        {{ log.action | replace('_', ' ') | title }}
+                                    </span>
+                                </td>
+                                <td>{{ log.ip_address }}</td>
+                                <td class="log-details">{{ log.details }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">No logs found matching your criteria</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if logs.pages > 1 %}
+            <nav aria-label="Audit log pagination">
+                <ul class="pagination">
+                    {% if logs.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.admin_logs', page=logs.prev_num, action=current_action, user_id=current_user_filter, date_from=date_from, date_to=date_to) }}">
+                                <i class="fas fa-angle-left"></i> Previous
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link"><i class="fas fa-angle-left"></i> Previous</span>
+                        </li>
+                    {% endif %}
+
+                    {% for page_num in range(max(1, logs.page - 3), min(logs.pages + 1, logs.page + 4)) %}
+                        {% if page_num == logs.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('main.admin_logs', page=page_num, action=current_action, user_id=current_user_filter, date_from=date_from, date_to=date_to) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if logs.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.admin_logs', page=logs.next_num, action=current_action, user_id=current_user_filter, date_from=date_from, date_to=date_to) }}">
+                                Next <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next <i class="fas fa-angle-right"></i></span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            
+            <div class="mt-4">
+                <a href="{{ url_for('main.admin_panel') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Admin Panel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

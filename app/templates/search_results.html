@@ -7,29 +7,187 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Keep the same styles as dashboard */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
             overflow-x: hidden;
+            min-height: 100vh;
         }
-        .navbar { background: #6a11cb; color: white; }
-        .navbar .navbar-brand { font-weight: bold; color: white; }
-        .sidebar { width: 250px; height: 100vh; background: white; position: fixed; top: 1; left: 0; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); padding-top: 1rem; }
-        .sidebar .nav-link { color: #333; font-weight: bold; }
-        .sidebar .nav-link:hover { background: #f5f5f5; border-left: 4px solid #6a11cb; color: #6a11cb; }
-        .content { margin-left: 260px; padding: 2rem; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .card { border: none; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; background: white; position: relative; transition: transform 0.3s ease; }
-        .card:hover { transform: scale(1.03); }
-        .card img { width: 100%; height: 150px; object-fit: cover; }
-        .card-body { padding: 1rem; text-align: center; }
-        .card-title { font-size: 1.2rem; font-weight: bold; color: #333; }
-        .actions { display: flex; justify-content: space-around; margin-top: 1rem; }
-        .actions button { background: none; border: none; color: #6a11cb; font-size: 1.2rem; cursor: pointer; }
-        .actions button:hover { color: #333; }
+
+        .navbar { 
+            background: #6a11cb; 
+            color: white;
+            padding: 1rem;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .search-form .form-control,
+        .search-form .form-select {
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .search-form .form-control:focus,
+        .search-form .form-select:focus {
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .search-form .btn {
+            background: #ffffff;
+            color: #6a11cb;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-form .btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+        }
+
+        .sidebar { 
+            width: 250px; 
+            height: 100vh; 
+            background: white; 
+            position: fixed; 
+            top: 100px; 
+            left: 0; 
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); 
+            padding-top: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar .nav-link { 
+            color: #333; 
+            font-weight: 500;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar .nav-link:hover { 
+            background: rgba(106, 17, 203, 0.1);
+            border-left: 4px solid #6a11cb;
+            color: #6a11cb;
+        }
+
+        .content { 
+            margin-left: 260px; 
+            padding: 2rem;
+            min-height: calc(100vh - 56px);
+        }
+
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .card { 
+            border: none; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            overflow: hidden; 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            transform-origin: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover { 
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(106, 17, 203, 0.2);
+        }
+
+        .card img { 
+            width: 100%; 
+            height: 180px; 
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+
+        .card-body { 
+            padding: 1.25rem; 
+            text-align: center;
+        }
+
+        .card-title { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            color: #2d3436;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-text {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #6a11cb;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #4e0ca3;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #2d3436;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #1e272e;
+            transform: translateY(-1px);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #2d3436;
+            font-size: 1.2rem;
+        }
+
+        .search-header {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        .search-header h1 {
+            margin: 0;
+            color: #2d3436;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -37,15 +195,21 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">My Storage</a>
-            <form class="d-flex ms-auto" method="GET" action="{{ url_for('main.search_results') }}">
-                <input class="form-control me-2" type="search" name="search" placeholder="Search files..." aria-label="Search" value="{{ search }}">
-                <select class="form-select me-2" name="filter">
+            <form class="search-form d-flex ms-auto" method="GET" action="{{ url_for('main.search_results') }}">
+                <input class="form-control" type="search" name="search" placeholder="Search files..." aria-label="Search" value="{{ search }}">
+                <select class="form-select" name="filter">
                     <option value="" {% if not file_filter %}selected{% endif %}>All</option>
                     <option value="image" {% if file_filter == 'image' %}selected{% endif %}>Images</option>
                     <option value="pdf" {% if file_filter == 'pdf' %}selected{% endif %}>PDFs</option>
                     <option value="video" {% if file_filter == 'video' %}selected{% endif %}>Videos</option>
                     <option value="audio" {% if file_filter == 'audio' %}selected{% endif %}>Audio</option>
                 </select>
+                <div class="form-check d-flex align-items-center">
+                    <input class="form-check-input" type="checkbox" name="include_trash" id="includeTrash" {% if include_trash %}checked{% endif %}>
+                    <label class="form-check-label text-white ms-2" for="includeTrash">
+                        Include Trash
+                    </label>
+                </div>
                 <button class="btn btn-light" type="submit">Search</button>
             </form>
         </div>
@@ -54,39 +218,63 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <nav class="nav flex-column">
-            <a class="nav-link" href="{{ url_for('main.dashboard') }}"><i class="fas fa-home me-2"></i>Home</a>
-            <a class="nav-link" href="#"><i class="fas fa-folder me-2"></i>My Files</a>
-            <a class="nav-link" href="#"><i class="fas fa-share-alt me-2"></i>Shared with Me</a>
-            <a class="nav-link" href="#"><i class="fas fa-trash me-2"></i>Trash</a>
-            <a class="nav-link" href="#"><i class="fas fa-chart-pie me-2"></i>Storage</a>
+            <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                <i class="fas fa-home me-2"></i>Home
+            </a>
+            <a class="nav-link" href="{{ url_for('main.shared_with_me') }}">
+                <i class="fas fa-share-alt me-2"></i>Shared with Me
+            </a>
+            <a class="nav-link" href="{{ url_for('main.trash') }}">
+                <i class="fas fa-trash me-2"></i>Trash
+            </a>
+            <a class="nav-link" href="{{ url_for('main.account') }}">
+                <i class="fas fa-user me-2"></i>My Account
+            </a>
+            {% if current_user.is_admin %}
+            <a class="nav-link" href="{{ url_for('main.admin_panel') }}">
+                <i class="fas fa-user-shield me-2"></i>Admin Panel
+            </a>
+            {% endif %}
         </nav>
     </div>
 
     <!-- Content -->
     <div class="content">
-        <h1>Search Results for "{{ search }}"</h1>
+        <div class="search-header">
+            <h1>Search Results for "{{ search }}"</h1>
+        </div>
+
         <div class="grid-container">
             {% for file in files %}
             <div class="card">
                 {% if file.file_type.startswith('image/') %}
                 <img src="{{ url_for('main.download_file', file_id=file.id) }}" alt="{{ file.filename }}">
                 {% else %}
-                <i class="fas fa-file card-img-top text-info" style="font-size: 5rem; padding: 2rem;"></i>
+                <div class="text-center pt-4">
+                    <i class="fas fa-file fa-4x text-info"></i>
+                </div>
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ file.filename }}</h5>
                     <p class="card-text">Located in: {{ file.folder_name or 'Root' }}</p>
-                    <a href="{{ url_for('main.dashboard', parent_folder=file.folder_name) }}" class="btn btn-primary">Go to Folder</a>
+                    <a href="{{ url_for('main.dashboard', parent_folder=file.folder_name) }}" class="btn btn-primary mt-2">
+                        <i class="fas fa-folder-open me-2"></i>Go to Folder
+                    </a>
                 </div>
             </div>
             {% endfor %}
         </div>
 
         {% if not files %}
-        <p>No results found.</p>
+        <div class="no-results">
+            <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+            <p>No results found.</p>
+        </div>
         {% endif %}
 
-        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary mt-4">Back to Dashboard</a>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary mt-4">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
     </div>
 
     <!-- Scripts -->
