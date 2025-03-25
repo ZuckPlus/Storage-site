@@ -1,3 +1,6 @@
+Keynote before starting this project or cloning, please star this to show support.
+***Setup your own Virtual enviornment AKA venv and download everything in the requirements txt file in your venv***
+
 # Secure Storage System
 
 A professional, feature-rich and secure file storage and sharing platform built with Flask.
