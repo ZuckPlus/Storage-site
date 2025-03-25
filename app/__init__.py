@@ -16,7 +16,16 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:/storage_system/instance/storage.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # Static secret key for CSRF protection
-    app.config['SECRET_KEY'] = '6HnvMP4To8'
+    app.config['SECRET_KEY'] = '8oT4PMvH6'
+    
+    # Set a larger maximum content length for file uploads (1GB)
+    app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 1024
+    
+    # Configuration for handling concurrent requests better
+    app.config['UPLOAD_FOLDER'] = 'instance/user_storage'  # Root folder for user uploads
+    app.config['THREADS_PER_PAGE'] = 8  # Number of threads per page
+    app.config['PREFERRED_URL_SCHEME'] = 'http'  # URL scheme
+    app.config['SERVER_NAME'] = None  # Allow dynamic server name
 
     # Initialize database, Migrate, and CSRF protection
     db.init_app(app)
