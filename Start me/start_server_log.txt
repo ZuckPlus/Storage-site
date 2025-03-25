@@ -1,0 +1,2 @@
+Thu 03/20/2025 10:12:28.78 - Starting start_server.bat 
+Thu 03/20/2025 10:12:28.78 - Changing to root directory 
