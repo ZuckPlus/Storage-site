@@ -13,3 +13,7 @@ after setting up virtual env, and installing all the libraries needed run "pytho
 
 Disclaimer this project is not intended for production and is no where near finished. 
 This website was modified by AI generated code, this means that some of the practises used in this program may not be the fastest, most secure, or pratical. 
+
+
+I did like 6 updates I forgot to push.
+![image](https://github.com/user-attachments/assets/663de135-63fd-4abc-811d-5efc0c3c4a2f)
