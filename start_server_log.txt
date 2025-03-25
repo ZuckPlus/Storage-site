@@ -1,0 +1,29 @@
+Thu 03/20/2025  9:41:27.34 - Current directory: C:\storage_system 
+Thu 03/20/2025  9:41:27.34 - server.py found 
+Thu 03/20/2025  9:41:27.35 - Activating virtual environment 
+Thu 03/20/2025  9:41:27.41 - Virtual environment activated successfully 
+Thu 03/20/2025  9:41:27.41 - Returning to root directory 
+Thu 03/20/2025  9:41:27.43 - Current directory: C:\storage_system 
+Thu 03/20/2025  9:41:27.43 - Starting the server 
+Thu 03/20/2025 10:01:54.78 - Current directory: C:\storage_system 
+Thu 03/20/2025 10:01:54.79 - server.py found 
+Thu 03/20/2025 10:01:54.79 - Activating virtual environment 
+Thu 03/20/2025 10:01:54.86 - Virtual environment activated successfully 
+Thu 03/20/2025 10:01:54.86 - Returning to root directory 
+Thu 03/20/2025 10:01:54.87 - Current directory: C:\storage_system 
+Thu 03/20/2025 10:01:54.88 - Starting the server 
+Thu 03/20/2025 10:04:12.38 - Server process ended 
+Thu 03/20/2025 10:04:44.68 - Current directory: C:\storage_system 
+Thu 03/20/2025 10:04:44.68 - server.py found 
+Thu 03/20/2025 10:04:44.69 - Activating virtual environment 
+Thu 03/20/2025 10:04:44.76 - Virtual environment activated successfully 
+Thu 03/20/2025 10:04:44.76 - Returning to root directory 
+Thu 03/20/2025 10:04:44.77 - Current directory: C:\storage_system 
+Thu 03/20/2025 10:04:44.78 - Starting the server 
+Thu 03/20/2025 10:12:28.80 - Current directory: C:\storage_system 
+Thu 03/20/2025 10:12:28.80 - server.py found 
+Thu 03/20/2025 10:12:28.81 - Activating virtual environment 
+Thu 03/20/2025 10:12:28.89 - Virtual environment activated successfully 
+Thu 03/20/2025 10:12:28.89 - Returning to root directory 
+Thu 03/20/2025 10:12:28.91 - Current directory: C:\storage_system 
+Thu 03/20/2025 10:12:28.92 - Starting the server 
