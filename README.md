@@ -6,6 +6,7 @@ Keynote before starting this project or cloning, please star this to show suppor
 A professional, feature-rich and secure file storage and sharing platform built with Flask.
 
 ![Storage System Dashboard](static/img/dashboard-preview.png)
+Dashboard image won't load. 
 
 ## Overview
 
